@@ -1,0 +1,47 @@
+{# مودال و اسکریپت مشترک CRUD لید در پنل ادمین #}
+<div id="lead-modal-backdrop" class="fixed inset-0 z-[120] hidden items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
+  <div class="w-full max-w-4xl rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+    <div class="mb-4 flex items-center justify-between border-b border-slate-100 pb-3">
+      <h3 class="text-lg font-bold text-slate-900">جزئیات کامل لید</h3>
+      <button type="button" id="lead-modal-close" class="rounded-lg border border-slate-200 px-3 py-1 text-slate-600 hover:bg-slate-100">
+        بستن
+      </button>
+    </div>
+    <div id="lead-modal-body" class="max-h-[70vh] overflow-y-auto"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const backdrop = document.getElementById('lead-modal-backdrop');
+  const modalBody = document.getElementById('lead-modal-body');
+  const closeBtn = document.getElementById('lead-modal-close');
+  if (!backdrop || !modalBody) return;
+
+  function closeModal() {
+    backdrop.classList.remove('flex');
+    backdrop.classList.add('hidden');
+    modalBody.innerHTML = '';
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.open-lead-modal').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const tpl = document.getElementById(btn.getAttribute('data-target'));
+      if (!tpl) return;
+      modalBody.innerHTML = tpl.innerHTML;
+      backdrop.classList.remove('hidden');
+      backdrop.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+  backdrop.addEventListener('click', function (e) {
+    if (e.target === backdrop) closeModal();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeModal();
+  });
+})();
+</script>

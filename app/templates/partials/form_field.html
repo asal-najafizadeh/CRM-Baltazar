@@ -1,0 +1,22 @@
+{% macro render_field(field, input_class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500") %}
+<div>
+  <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ field.id }}">
+    {{ field.label.text }}
+    {% if field.flags.required %}<span class="text-red-500">*</span>{% endif %}
+  </label>
+  {% if field.type == 'TextAreaField' %}
+    {{ field(class=input_class ~ " min-h-[100px]", rows=field.render_kw.get('rows', 4) if field.render_kw else 4) }}
+  {% elif field.type == 'SelectField' %}
+    {{ field(class=input_class) }}
+  {% elif field.is_jalali_date %}
+    {{ field(class=input_class ~ " jalali-date-input", dir="ltr") }}
+  {% elif field.is_jalali_datetime %}
+    {{ field(class=input_class ~ " jalali-datetime-input", dir="ltr") }}
+  {% else %}
+    {{ field(class=input_class) }}
+  {% endif %}
+  {% for error in field.errors %}
+    <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+  {% endfor %}
+</div>
+{% endmacro %}

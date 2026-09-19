@@ -1,0 +1,30 @@
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">نام کسب‌وکار</th>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">شماره تماس</th>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">نوع کسب‌وکار</th>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">منبع</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for lead in leads %}
+        <tr>
+          <td class="px-4 py-3 font-medium">{{ lead.company_name }}</td>
+          <td class="px-4 py-3" dir="ltr">{{ lead.phone_number }}</td>
+          <td class="px-4 py-3">{{ lead.business_type_display }}</td>
+          <td class="px-4 py-3">{{ lead.source_display }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="4" class="px-4 py-8 text-center text-slate-500">
+            سرنخی در صف شما وجود ندارد.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+{# دکمه‌های CRUD ادمین برای یک ردیف لید — نیاز به lead و return_to #}
+<div class="flex flex-wrap items-center gap-2">
+  <button type="button"
+          class="open-lead-modal rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-800 hover:bg-indigo-100"
+          data-target="lead-details-{{ lead.id }}">
+    مشاهده کامل
+  </button>
+  <a href="{{ url_for('admin.edit_lead', lead_id=lead.id, next=return_to) }}"
+     class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-800 hover:bg-amber-100">
+    ویرایش
+  </a>
+  <form method="post"
+        action="{{ url_for('admin.delete_lead', lead_id=lead.id) }}"
+        class="inline"
+        onsubmit="return confirm('آیا از حذف این لید مطمئن هستید؟');">
+    {% include "partials/csrf_input.html" %}
+    <input type="hidden" name="next" value="{{ return_to }}">
+    <button type="submit"
+            class="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100">
+      حذف
+    </button>
+  </form>
+</div>
+<template id="lead-details-{{ lead.id }}">
+  {% include "partials/admin_lead_detail_modal.html" %}
+</template>

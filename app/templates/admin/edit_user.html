@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% from "partials/form_field.html" import render_field %}
+{% block title %}ویرایش کاربر — مدیریت{% endblock %}
+
+{% block sidebar_nav %}
+{% include "admin/_sidebar_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-lg">
+  <a href="{{ url_for('admin.dashboard') }}" class="text-sm text-indigo-600 hover:text-indigo-800">← بازگشت به داشبورد</a>
+  <h1 class="mt-4 mb-2 text-2xl font-bold">ویرایش کاربر</h1>
+  <p class="mb-6 text-sm text-slate-500">کاربر: {{ user.username }}</p>
+  <form method="post" class="space-y-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    {{ form.hidden_tag() }}
+    {{ render_field(form.username) }}
+    {{ render_field(form.role) }}
+    {{ render_field(form.password) }}
+    <p class="text-xs text-slate-500">اگر رمز عبور جدید خالی باشد، رمز فعلی حفظ می‌شود.</p>
+    {{ form.submit(class="rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white hover:bg-indigo-700") }}
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}کل تماس‌های موفق SDR{% endblock %}
+
+{% block sidebar_nav %}
+{% include "admin/_sidebar_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<section class="space-y-4">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900">کل تماس‌های موفق SDR</h1>
+    <p class="text-sm text-slate-500">گزارش کامل ارائه‌های موفق ثبت‌شده توسط کارشناسان SDR</p>
+  </div>
+  <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200 text-sm">
+        <thead class="bg-slate-50">
+          <tr>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">کسب‌وکار</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">SDR</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">تصمیم‌گیرنده</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">اقدام بعدی</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">زمان تماس</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">عملیات</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for lead in leads %}
+          <tr class="hover:bg-slate-50/80">
+            <td class="px-4 py-3 font-medium">{{ lead.company_name }}</td>
+            <td class="px-4 py-3">{{ lead.sdr_agent_username }}</td>
+            <td class="px-4 py-3">
+              {% if lead.sdr_contact_person %}
+                {{ lead.sdr_contact_person }}{% if lead.sdr_contact_name %} - نام: {{ lead.sdr_contact_name }}{% endif %}
+              {% else %}
+                —
+              {% endif %}
+            </td>
+            <td class="px-4 py-3">{{ lead.sdr_next_action or '—' }}</td>
+            <td class="px-4 py-3 text-slate-500">{{ format_jalali_datetime(lead.sdr_processed_at) }}</td>
+            <td class="px-4 py-3">
+              {% include "partials/admin_lead_row_actions.html" %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">تماس موفقی ثبت نشده است.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% include "partials/admin_lead_crud_shell.html" %}
+{% endblock %}

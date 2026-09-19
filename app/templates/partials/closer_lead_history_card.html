@@ -1,0 +1,72 @@
+{# تاریخچه کامل سرنخ برای کلوزر #}
+<div class="space-y-6">
+  <section class="rounded-xl border-2 border-amber-200 bg-amber-50/50 p-5">
+    <h4 class="mb-4 font-bold text-amber-900">از بخش LH (شکارچی سرنخ)</h4>
+    <dl class="grid gap-2 text-sm sm:grid-cols-2">
+      <div><dt class="text-slate-500">نام کسب و کار:</dt><dd class="font-medium">{{ lead.company_name }}</dd></div>
+      <div><dt class="text-slate-500">شماره تماس:</dt><dd dir="ltr">{{ lead.phone_number }}</dd></div>
+      <div><dt class="text-slate-500">نوع کسب و کار:</dt><dd>{{ lead.business_type_display }}</dd></div>
+      <div><dt class="text-slate-500">منبع:</dt><dd>{{ lead.source_display }}</dd></div>
+      <div class="sm:col-span-2"><dt class="text-slate-500">آدرس سایت:</dt><dd dir="ltr" class="break-all">{{ lead.website or '—' }}</dd></div>
+      <div><dt class="text-slate-500">اینستاگرام:</dt><dd dir="ltr">{{ lead.instagram or '—' }}</dd></div>
+      <div><dt class="text-slate-500">تلگرام:</dt><dd dir="ltr">{{ lead.telegram or '—' }}</dd></div>
+      <div class="sm:col-span-2"><dt class="text-slate-500">آدرس:</dt><dd>{{ lead.address or '—' }}</dd></div>
+      <div class="sm:col-span-2">
+        <dt class="text-slate-500">توضیحات اولیه:</dt>
+        <dd class="mt-1 rounded bg-white p-2 whitespace-pre-wrap">{{ lead.description or '—' }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="rounded-xl border-2 border-indigo-200 bg-indigo-50/50 p-5">
+    <h4 class="mb-4 font-bold text-indigo-900">از بخش SDR</h4>
+    <dl class="grid gap-2 text-sm sm:grid-cols-2">
+      <div><dt class="text-slate-500">شدت مشکل:</dt><dd>{{ lead.sdr_pain_severity or '—' }}</dd></div>
+      <div><dt class="text-slate-500">قدرت خرید:</dt><dd>{{ lead.sdr_buying_power or '—' }}</dd></div>
+      <div>
+        <dt class="text-slate-500">شخص تصمیم‌گیرنده:</dt>
+        <dd>
+          {% if lead.sdr_contact_person %}
+            {{ lead.sdr_contact_person }}
+            {% if lead.sdr_contact_name %} - نام: {{ lead.sdr_contact_name }}{% endif %}
+          {% else %}
+            —
+          {% endif %}
+        </dd>
+      </div>
+      <div><dt class="text-slate-500">سطح علاقه‌مندی:</dt><dd>{{ lead.sdr_interest_level or '—' }}</dd></div>
+      <div class="sm:col-span-2">
+        <dt class="text-slate-500">خلاصه مکالمه تلفنی:</dt>
+        <dd class="mt-1 rounded bg-white p-2 whitespace-pre-wrap">{{ lead.sdr_summary or '—' }}</dd>
+      </div>
+    </dl>
+  </section>
+
+  {% if lead.is_proposal_sent %}
+  <section class="rounded-xl border border-emerald-200 bg-emerald-50/50 p-5">
+    <h4 class="mb-3 font-bold text-emerald-900">پروپوزال PM</h4>
+    <p class="text-sm"><strong>{{ lead.proposal_title }}</strong> — {{ "{:,.0f}".format(lead.proposal_amount) if lead.proposal_amount else '' }} تومان</p>
+    <p class="mt-2 text-sm whitespace-pre-wrap text-slate-700">{{ lead.proposal_details or '' }}</p>
+  </section>
+  {% endif %}
+
+  <section class="rounded-xl border-2 border-violet-200 bg-violet-50/50 p-5">
+    <h4 class="mb-4 font-bold text-violet-900">از بخش Setter</h4>
+    <dl class="grid gap-2 text-sm sm:grid-cols-2">
+      <div>
+        <dt class="text-slate-500">تاریخ و ساعت جلسه:</dt>
+        <dd class="font-medium text-violet-800">
+          {{ lead.setter_meeting_date.strftime('%Y/%m/%d %H:%M') if lead.setter_meeting_date else '—' }}
+        </dd>
+      </div>
+      <div>
+        <dt class="text-slate-500">مکان جلسه:</dt>
+        <dd>{{ lead.setter_meeting_location or '—' }}</dd>
+      </div>
+      <div class="sm:col-span-2">
+        <dt class="text-slate-500">یادداشت‌های Setter:</dt>
+        <dd class="mt-1 rounded bg-white p-2 whitespace-pre-wrap">{{ lead.setter_notes or '—' }}</dd>
+      </div>
+    </dl>
+  </section>
+</div>

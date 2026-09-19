@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}مدیریت توزیع لیدها{% endblock %}
+
+{% block sidebar_nav %}
+{% include "admin/_sidebar_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl space-y-10">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900">مدیریت توزیع لیدها</h1>
+    <p class="mt-1 text-sm text-slate-500">توزیع دستی و مساوی لیدهای توزیع‌نشده — امروز و معوقه به‌صورت جداگانه</p>
+  </div>
+
+  {# --- بخش الف: لیدهای امروز --- #}
+  <section class="space-y-4 rounded-xl border border-indigo-200 bg-white p-6 shadow-sm">
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900">توزیع لیدهای جدید امروز</h2>
+      <p class="mt-1 text-sm text-slate-500">فقط لیدهای ثبت‌شده در تاریخ امروز ({{ jalali_today }}) که هنوز به SDR اختصاص نیافته‌اند</p>
+    </div>
+
+    <div class="rounded-xl border border-indigo-200 bg-indigo-50/50 p-5">
+      <p class="text-sm text-slate-600">امروز ({{ jalali_today }})</p>
+      <p class="mt-2 text-xl font-bold text-indigo-800">
+        تعداد لیدهای توزیع‌نشده امروز: {{ to_persian_digits(today_unassigned_count) }} عدد
+      </p>
+    </div>
+
+    <form method="post" class="space-y-4">
+      {{ today_form.hidden_tag() }}
+      <label class="block text-sm font-medium text-slate-700">انتخاب کارشناسان SDR فعال</label>
+      <div class="grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:grid-cols-2">
+        {% for value, label in today_form.sdr_ids.choices %}
+        <label class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+          <input type="checkbox" name="today-sdr_ids" value="{{ value }}" class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                 {% if value in (today_form.sdr_ids.data or []) %}checked{% endif %}>
+          <span>{{ label }}</span>
+        </label>
+        {% else %}
+        <p class="text-sm text-amber-700">هیچ SDR فعالی برای توزیع وجود ندارد.</p>
+        {% endfor %}
+      </div>
+      {% if today_form.sdr_ids.errors %}
+        <p class="text-xs text-red-600">{{ today_form.sdr_ids.errors[0] }}</p>
+      {% endif %}
+      <button type="submit" name="today-submit" value="1"
+              class="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
+              {% if not today_form.sdr_ids.choices or today_unassigned_count == 0 %}disabled{% endif %}>
+        تقسیم و توزیع مساوی لیدهای امروز
+      </button>
+    </form>
+  </section>
+
+  {# --- بخش ب: لیدهای معوقه --- #}
+  <section class="space-y-4 rounded-xl border border-amber-200 bg-white p-6 shadow-sm">
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900">توزیع لیدهای معوقه و پخش‌نشده قبلی</h2>
+      <p class="mt-1 text-sm text-slate-500">لیدهای ثبت‌شده در روزهای قبل از امروز که هنوز به هیچ SDRی اختصاص داده نشده‌اند</p>
+    </div>
+
+    <div class="rounded-xl border border-amber-200 bg-amber-50/60 p-5">
+      <p class="text-sm text-amber-800">معوقه (روزهای گذشته)</p>
+      <p class="mt-2 text-xl font-bold text-amber-900">
+        تعداد لیدهای معوقه و پخش‌نشده از روزهای گذشته: {{ to_persian_digits(backlog_unassigned_count) }} عدد
+      </p>
+    </div>
+
+    <form method="post" class="space-y-4">
+      {{ backlog_form.hidden_tag() }}
+      <label class="block text-sm font-medium text-slate-700">انتخاب کارشناسان SDR فعال</label>
+      <div class="grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:grid-cols-2">
+        {% for value, label in backlog_form.sdr_ids.choices %}
+        <label class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+          <input type="checkbox" name="backlog-sdr_ids" value="{{ value }}" class="h-4 w-4 rounded border-slate-300 text-amber-600 focus:ring-amber-500"
+                 {% if value in (backlog_form.sdr_ids.data or []) %}checked{% endif %}>
+          <span>{{ label }}</span>
+        </label>
+        {% else %}
+        <p class="text-sm text-amber-700">هیچ SDR فعالی برای توزیع وجود ندارد.</p>
+        {% endfor %}
+      </div>
+      {% if backlog_form.sdr_ids.errors %}
+        <p class="text-xs text-red-600">{{ backlog_form.sdr_ids.errors[0] }}</p>
+      {% endif %}
+      <button type="submit" name="backlog-submit" value="1"
+              class="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
+              {% if not backlog_form.sdr_ids.choices or backlog_unassigned_count == 0 %}disabled{% endif %}>
+        تقسیم و توزیع مساوی لیدهای معوقه
+      </button>
+    </form>
+  </section>
+</section>
+{% endblock %}

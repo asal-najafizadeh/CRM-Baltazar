@@ -1,0 +1,40 @@
+<a href="{{ url_for('admin.dashboard') }}"
+   class="rounded-lg px-3 py-2 {% if request.endpoint == 'admin.dashboard' %}bg-indigo-50 font-medium text-indigo-700{% else %}hover:bg-slate-100{% endif %}">
+  داشبورد مدیریت
+</a>
+<a href="{{ url_for('admin.followups') }}"
+   class="rounded-lg px-3 py-2 {% if request.endpoint == 'admin.followups' %}bg-indigo-50 font-medium text-indigo-700{% else %}hover:bg-slate-100{% endif %}">
+  آمار کل پیگیری‌ها
+</a>
+<a href="{{ url_for('admin.archived_leads') }}"
+   class="rounded-lg px-3 py-2 {% if request.endpoint == 'admin.archived_leads' %}bg-indigo-50 font-medium text-indigo-700{% else %}hover:bg-slate-100{% endif %}">
+  لیدهای حذف/بایگانی شده
+</a>
+<a href="{{ url_for('admin.setter_performance') }}"
+   class="rounded-lg px-3 py-2 {% if request.endpoint == 'admin.setter_performance' %}bg-indigo-50 font-medium text-indigo-700{% else %}hover:bg-slate-100{% endif %}">
+  گزارش عملکرد Setter
+</a>
+<a href="{{ url_for('admin.closer_meetings') }}"
+   class="rounded-lg px-3 py-2 {% if request.endpoint == 'admin.closer_meetings' %}bg-indigo-50 font-medium text-indigo-700{% else %}hover:bg-slate-100{% endif %}">
+  گزارش جلسات حضوری (Closer)
+</a>
+<a href="{{ url_for('admin.sdr_success_calls') }}"
+   class="rounded-lg px-3 py-2 {% if request.endpoint == 'admin.sdr_success_calls' %}bg-indigo-50 font-medium text-indigo-700{% else %}hover:bg-slate-100{% endif %}">
+  کل تماس‌های موفق SDR
+</a>
+<a href="{{ url_for('admin.lead_distribution') }}"
+   class="rounded-lg px-3 py-2 {% if request.endpoint == 'admin.lead_distribution' %}bg-indigo-50 font-medium text-indigo-700{% else %}hover:bg-slate-100{% endif %}">
+  توزیع لیدهای امروز
+</a>
+<a href="{{ url_for('admin.bulk_import') }}"
+   class="rounded-lg px-3 py-2 {% if request.endpoint == 'admin.bulk_import' %}bg-indigo-50 font-medium text-indigo-700{% else %}hover:bg-slate-100{% endif %}">
+  آپلود گروهی اکسل
+</a>
+<a href="{{ url_for('admin.master_leads') }}"
+   class="rounded-lg px-3 py-2 {% if request.endpoint == 'admin.master_leads' %}bg-indigo-50 font-medium text-indigo-700{% else %}hover:bg-slate-100{% endif %}">
+  مدیریت کل لیدها
+</a>
+<a href="{{ url_for('admin.create_user') }}"
+   class="rounded-lg px-3 py-2 {% if request.endpoint == 'admin.create_user' %}bg-indigo-50 font-medium text-indigo-700{% else %}hover:bg-slate-100{% endif %}">
+  کاربر جدید
+</a>

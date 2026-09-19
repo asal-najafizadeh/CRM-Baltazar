@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}گزارش جلسات حضوری (Closer){% endblock %}
+
+{% block sidebar_nav %}
+{% include "admin/_sidebar_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<section class="space-y-4">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900">گزارش جلسات حضوری (Closer)</h1>
+    <p class="text-sm text-slate-500">ثبت کامل وضعیت برگزاری جلسه حضوری و نتیجه همکاری</p>
+  </div>
+  <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200 text-sm">
+        <thead class="bg-slate-50">
+          <tr>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">کسب‌وکار</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">Closer</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">وضعیت جلسه</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">وضعیت همکاری</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">آخرین به‌روزرسانی</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">عملیات</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for lead in leads %}
+          <tr class="hover:bg-slate-50/80">
+            <td class="px-4 py-3 font-medium">{{ lead.company_name }}</td>
+            <td class="px-4 py-3">{{ lead.closer_agent_username }}</td>
+            <td class="px-4 py-3">{{ lead.closer_meeting_status or '—' }}</td>
+            <td class="px-4 py-3">{{ lead.closer_cooperation_status or '—' }}</td>
+            <td class="px-4 py-3 text-slate-500">{{ format_jalali_datetime(lead.updated_at) }}</td>
+            <td class="px-4 py-3">
+              {% include "partials/admin_lead_row_actions.html" %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">رکوردی برای جلسات حضوری وجود ندارد.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% include "partials/admin_lead_crud_shell.html" %}
+{% endblock %}

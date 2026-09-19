@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}داشبورد PM — Baltazar CRM{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+  <h1 class="text-2xl font-bold text-slate-900">داشبورد مدیر پیشنهاد (PM)</h1>
+  <p class="mt-1 text-slate-600">
+    سرنخ‌های مرحله ۴ — بررسی اطلاعات کامل LH و SDR و ثبت پروپوزال
+  </p>
+</div>
+
+{% if not leads %}
+<div class="rounded-xl border border-slate-200 bg-white px-6 py-16 text-center text-slate-500 shadow-sm">
+  سرنخی در صف PM نیست. سرنخ‌ها پس از انتخاب «ارسال اطلاعات (پروپوزال)» توسط SDR اینجا نمایش داده می‌شوند.
+</div>
+{% endif %}
+
+<div class="space-y-10">
+  {% for lead in leads %}
+  <article id="lead-{{ lead.id }}"
+           class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm
+                  {% if lead.is_proposal_sent %}ring-2 ring-emerald-200{% endif %}">
+
+    <header class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50 px-6 py-4">
+      <div>
+        <p class="text-xs text-slate-500">شناسه سرنخ #{{ lead.id }}</p>
+        <h2 class="text-xl font-bold text-slate-900">{{ lead.company_name }}</h2>
+      </div>
+      {% if lead.is_proposal_sent %}
+      <span class="rounded-full bg-emerald-500 px-4 py-1.5 text-sm font-medium text-white">
+        پروپوزال ارسال شد — SDR مطلع شد
+      </span>
+      {% else %}
+      <span class="rounded-full bg-amber-100 px-4 py-1.5 text-sm font-medium text-amber-800">
+        در انتظار ثبت پروپوزال
+      </span>
+      {% endif %}
+    </header>
+
+    <div class="grid gap-8 p-6 lg:grid-cols-2">
+      <div>
+        <h3 class="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
+          پرونده کامل سرنخ
+        </h3>
+        {% include "partials/pm_lead_detail_card.html" %}
+      </div>
+
+      <div>
+        <h3 class="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
+          {% if lead.is_proposal_sent %}پروپوزال ثبت‌شده{% else %}ثبت پروپوزال{% endif %}
+        </h3>
+
+        {% if lead.is_proposal_sent %}
+        <div class="rounded-xl border border-emerald-200 bg-emerald-50/50 p-6 text-sm">
+          <dl class="space-y-3">
+            <div>
+              <dt class="text-slate-500">عنوان پروپوزال</dt>
+              <dd class="font-medium text-slate-900">{{ lead.proposal_title }}</dd>
+            </div>
+            <div>
+              <dt class="text-slate-500">مبلغ پیشنهادی</dt>
+              <dd class="font-medium text-slate-900" dir="ltr">
+                {{ "{:,.0f}".format(lead.proposal_amount) if lead.proposal_amount else '—' }} تومان
+              </dd>
+            </div>
+            <div>
+              <dt class="text-slate-500">تاریخ پروپوزال</dt>
+              <dd>{{ format_jalali_date(lead.proposal_date) }}</dd>
+            </div>
+            <div>
+              <dt class="text-slate-500">جزئیات</dt>
+              <dd class="mt-1 whitespace-pre-wrap rounded-lg bg-white p-3 text-slate-800 border border-emerald-100">
+                {{ lead.proposal_details }}
+              </dd>
+            </div>
+          </dl>
+          <p class="mt-4 text-xs text-emerald-700">
+            این سرنخ در داشبورد SDR با نشانگر سبز برای تماس پیگیری نمایش داده می‌شود.
+          </p>
+        </div>
+        {% else %}
+        <form method="post"
+              action="{{ url_for('pm.submit_proposal', lead_id=lead.id) }}"
+              class="space-y-4 rounded-xl border border-slate-200 bg-slate-50/50 p-6">
+          {% include "partials/csrf_input.html" %}
+          <div>
+            <label class="mb-1 block text-sm font-medium text-slate-700" for="proposal_title_{{ lead.id }}">
+              عنوان پروپوزال <span class="text-red-500">*</span>
+            </label>
+            <input type="text" name="proposal_title" id="proposal_title_{{ lead.id }}" required
+                   class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                   placeholder="مثال: پکیج دیجیتال مارکتینگ ۶ ماهه">
+          </div>
+          <div>
+            <label class="mb-1 block text-sm font-medium text-slate-700" for="proposal_amount_{{ lead.id }}">
+              مبلغ پیشنهادی (تومان) <span class="text-red-500">*</span>
+            </label>
+            <input type="number" name="proposal_amount" id="proposal_amount_{{ lead.id }}" required min="0" step="1000"
+                   class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                   placeholder="150000000" dir="ltr">
+          </div>
+          <div>
+            <label class="mb-1 block text-sm font-medium text-slate-700" for="proposal_date_{{ lead.id }}">
+              تاریخ پروپوزال <span class="text-red-500">*</span>
+            </label>
+            <input type="text" name="proposal_date" id="proposal_date_{{ lead.id }}" required
+                   data-jdp
+                   autocomplete="off"
+                   placeholder="۱۴۰۳/۰۱/۰۱"
+                   dir="ltr"
+                   class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+          </div>
+          <div>
+            <label class="mb-1 block text-sm font-medium text-slate-700" for="proposal_details_{{ lead.id }}">
+              جزئیات و توضیحات پروپوزال <span class="text-red-500">*</span>
+            </label>
+            <textarea name="proposal_details" id="proposal_details_{{ lead.id }}" required rows="6"
+                      class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      placeholder="شرح کامل خدمات، زمان‌بندی، شرایط پرداخت و..."></textarea>
+          </div>
+          <button type="submit"
+                  class="w-full cursor-pointer rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700">
+            ثبت و ارسال پروپوزال به SDR
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}

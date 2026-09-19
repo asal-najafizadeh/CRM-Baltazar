@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}داشبورد ستر — Baltazar CRM{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+  <h1 class="text-2xl font-bold text-slate-900">داشبورد ستر (Setter)</h1>
+  <p class="mt-1 text-slate-600">هماهنگی جلسه، پیگیری و انتقال به کلوزر</p>
+</div>
+
+<section class="mb-10">
+  <h2 class="mb-4 text-lg font-semibold text-slate-900">لیدهای جدید (در انتظار هماهنگی)</h2>
+  <p class="mb-4 text-sm text-slate-500">
+    سرنخ‌های منتقل‌شده از SDR — قبل از تماس، کارت خلاصه کامل را در صفحه هماهنگی ببینید.
+  </p>
+  {% with leads=new_inbound, action='process', show_meeting=false, action_label='شروع هماهنگی', empty_message='لید جدیدی در صف نیست.' %}
+    {% include "partials/setter_lead_table.html" %}
+  {% endwith %}
+</section>
+
+<section class="mb-10">
+  <h2 class="mb-4 text-lg font-semibold text-slate-900">لیست پیگیری‌های معلق</h2>
+  <p class="mb-4 text-sm text-slate-500">وضعیت نامشخص — نیاز به تماس و به‌روزرسانی مجدد</p>
+  {% with leads=followup_leads, action='process', show_meeting=true, action_label='ویرایش / پیگیری', empty_message='پیگیری معلقی وجود ندارد.' %}
+    {% include "partials/setter_lead_table.html" %}
+  {% endwith %}
+</section>
+
+<section>
+  <h2 class="mb-4 text-lg font-semibold text-slate-900">لیست جلسات کنسل/حذف شده</h2>
+  <p class="mb-4 text-sm text-slate-500">جلسات رد شده — خارج از پایپ‌لاین فعال</p>
+  {% with leads=rejected_leads, action='view', show_meeting=true, empty_message='مورد کنسل‌شده‌ای ثبت نشده.' %}
+    {% include "partials/setter_lead_table.html" %}
+  {% endwith %}
+</section>
+{% endblock %}

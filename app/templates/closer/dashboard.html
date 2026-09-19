@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}داشبورد کلوزر — Baltazar CRM{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+  <h1 class="text-2xl font-bold text-slate-900">داشبورد کلوزر (Closer)</h1>
+  <p class="mt-1 text-slate-600">جلسات نهایی، ثبت نتیجه معامله و پیگیری مجدد</p>
+</div>
+
+<section class="mb-10">
+  <h2 class="mb-4 text-lg font-semibold text-slate-900">جلسات جدید ارجاع شده</h2>
+  <p class="mb-4 text-sm text-slate-500">سرنخ‌های مرحله ۵ از ستر — در انتظار ثبت نتیجه جلسه نهایی</p>
+  {% with leads=new_referrals, show_followup_date=false, action_label='ثبت نتیجه جلسه', empty_message='جلسه جدیدی در صف نیست.' %}
+    {% include "partials/closer_lead_table.html" %}
+  {% endwith %}
+</section>
+
+<section>
+  <h2 class="mb-4 text-lg font-semibold text-slate-900">لیست پیگیری‌های مجدد</h2>
+  <p class="mb-4 text-sm text-slate-500">نیاز به جلسه پیگیری — تاریخ مشخص شده است</p>
+  {% with leads=followup_leads, show_followup_date=true, action_label='به‌روزرسانی نتیجه', empty_message='پیگیری مجددی ثبت نشده.' %}
+    {% include "partials/closer_lead_table.html" %}
+  {% endwith %}
+</section>
+{% endblock %}

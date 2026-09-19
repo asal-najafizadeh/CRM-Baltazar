@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}آپلود گروهی اکسل — Baltazar CRM{% endblock %}
+
+{% block sidebar_nav %}
+{% include "admin/_sidebar_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+  <h1 class="text-2xl font-bold text-slate-900">آپلود گروهی اکسل</h1>
+  <p class="mt-1 text-slate-600">واردسازی سرنخ‌ها از فایل Excel به صف SDR</p>
+</div>
+
+<div class="grid gap-8 lg:grid-cols-2">
+  <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h2 class="mb-4 text-lg font-semibold text-slate-900">انتخاب فایل</h2>
+    <form method="post" enctype="multipart/form-data" class="space-y-4" novalidate>
+      {{ form.hidden_tag() }}
+      <div>
+        <label class="mb-1 block text-sm font-medium text-slate-700" for="excel_file">
+          {{ form.excel_file.label.text }}
+          <span class="text-red-500">*</span>
+        </label>
+        <input type="file"
+               name="excel_file"
+               id="excel_file"
+               accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+               class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm file:ml-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-4 file:py-2 file:text-sm file:font-medium file:text-indigo-700 hover:file:bg-indigo-100">
+        {% for error in form.excel_file.errors %}
+        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+        {% endfor %}
+      </div>
+      {{ form.submit(class="w-full cursor-pointer rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700") }}
+    </form>
+  </section>
+
+  <section class="rounded-xl border border-indigo-100 bg-indigo-50/40 p-6 text-sm text-slate-700">
+    <h2 class="mb-3 font-semibold text-indigo-900">راهنمای قالب فایل</h2>
+    <ul class="list-inside list-disc space-y-2">
+      <li>فرمت مجاز: <span dir="ltr">.xlsx</span> یا <span dir="ltr">.xls</span></li>
+      <li>ردیف اول (سرستون) نادیده گرفته می‌شود؛ داده‌ها از <strong>ردیف ۲</strong> خوانده می‌شوند.</li>
+      <li><strong>ستون B:</strong> نام کسب‌وکار</li>
+      <li><strong>ستون C:</strong> نوع کسب‌وکار</li>
+      <li><strong>ستون D:</strong> شماره تماس</li>
+    </ul>
+    <p class="mt-4 rounded-lg border border-indigo-200 bg-white p-3 text-xs text-slate-600">
+      شماره‌های تکراری (موجود در سیستم یا تکراری در همان فایل) وارد نمی‌شوند.
+      سرنخ‌های جدید به‌صورت خودکار به مرحله ۲ و SDR فعال اختصاص می‌یابند.
+    </p>
+    <p class="mt-4 text-xs text-slate-500" dir="ltr">
+      pip install pandas openpyxl
+    </p>
+  </section>
+</div>
+{% endblock %}

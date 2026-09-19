@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+{% from "partials/form_field.html" import render_field %}
+{% block title %}ثبت تماس — {{ lead.company_name }}{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+  <a href="{{ url_for('sdr.dashboard') }}" class="text-sm text-indigo-600 hover:text-indigo-800">← بازگشت به داشبورد SDR</a>
+  <h1 class="mt-4 text-2xl font-bold text-slate-900">ثبت تماس: {{ lead.company_name }}</h1>
+</div>
+
+<div class="mb-8">
+  {% include "partials/lh_intake_card.html" %}
+</div>
+
+<div class="grid gap-8 lg:grid-cols-3">
+  <section class="lg:col-span-2 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <h2 class="mb-2 text-lg font-semibold text-slate-900">
+      {% if is_followup %}به‌روزرسانی پیگیری{% else %}فرم ارزیابی تماس{% endif %}
+    </h2>
+    <p id="call-status-hint" class="mb-6 hidden text-sm text-amber-700"></p>
+
+    <form method="post" class="space-y-4" id="sdr-form" novalidate>
+      {{ form.hidden_tag() }}
+      {{ render_field(form.sdr_call_status) }}
+
+      <div id="wrong-number-fields" class="hidden space-y-4 rounded-lg border border-rose-200 bg-rose-50/50 p-4">
+        {{ render_field(form.wrong_number_type) }}
+        {{ render_field(form.wrong_number_notes) }}
+      </div>
+
+      <div id="sdr-detail-fields" class="space-y-4">
+        {{ render_field(form.sdr_result) }}
+
+        <div id="rejection-reason-wrap" class="hidden">
+          {{ render_field(form.sdr_rejection_reason) }}
+        </div>
+
+        <div class="sdr-required-when-answered">
+          {{ render_field(form.sdr_pain_severity) }}
+          {{ render_field(form.sdr_buying_power) }}
+          {{ render_field(form.sdr_contact_person) }}
+          <div id="contact-name-wrap" class="hidden">
+            {{ render_field(form.sdr_contact_name) }}
+          </div>
+          {{ render_field(form.sdr_interest_level) }}
+          {{ render_field(form.sdr_next_action) }}
+        </div>
+
+        <div id="followup-date-wrap" class="hidden">
+          {{ render_field(form.sdr_followup_date) }}
+        </div>
+
+        <div class="sdr-required-when-answered">
+          {{ render_field(form.sdr_summary) }}
+        </div>
+      </div>
+
+      <div id="unanswered-note-wrap" class="hidden rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+        با وضعیت «بدون پاسخ»، سایر فیلدها اختیاری هستند. در صورت نیاز می‌توانید «اقدام بعدی» را انتخاب کنید.
+      </div>
+
+      {{ form.submit(class="w-full cursor-pointer rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700") }}
+    </form>
+  </section>
+
+  <aside class="hidden lg:block rounded-xl border border-slate-200 bg-slate-50 p-4 text-xs text-slate-500">
+    <p class="font-medium text-slate-700">راهنما</p>
+    <ul class="mt-2 list-inside list-disc space-y-1">
+      <li>پاسخ داد → همه فیلدهای ارزیابی اجباری</li>
+      <li>شماره اشتباه → فقط نوع خطا و توضیحات</li>
+      <li>پاسخ نداد / قطع → فیلدهای ارزیابی اختیاری</li>
+    </ul>
+  </aside>
+</div>
+
+<script>
+(function () {
+  const ANSWERED = 'پاسخ داد';
+  const WRONG_NUMBER = 'شماره اشتباه';
+  const NO_ANSWER = ['پاسخ نداد', 'تماس قطع شده'];
+
+  const callStatusSelect = document.getElementById('sdr_call_status');
+  const detailFields = document.getElementById('sdr-detail-fields');
+  const wrongNumberFields = document.getElementById('wrong-number-fields');
+  const unansweredNote = document.getElementById('unanswered-note-wrap');
+  const callHint = document.getElementById('call-status-hint');
+  const resultSelect = document.getElementById('sdr_result');
+  const nextActionSelect = document.getElementById('sdr_next_action');
+  const rejectionWrap = document.getElementById('rejection-reason-wrap');
+  const followupWrap = document.getElementById('followup-date-wrap');
+  const contactNameWrap = document.getElementById('contact-name-wrap');
+  const contactPersonSelect = document.getElementById('sdr_contact_person');
+  const contactNameInput = document.getElementById('sdr_contact_name');
+
+  function setFieldRequired(el, required) {
+    if (!el) return;
+    if (required) {
+      el.setAttribute('required', 'required');
+    } else {
+      el.removeAttribute('required');
+    }
+  }
+
+  function setContainerDisabled(container, disabled) {
+    if (!container) return;
+    container.querySelectorAll('select, textarea, input').forEach(function (el) {
+      if (el.name === 'csrf_token' || el.type === 'submit') return;
+      el.disabled = disabled;
+      if (disabled) el.removeAttribute('required');
+    });
+  }
+
+  function toggleCallStatusMode() {
+    const status = callStatusSelect ? callStatusSelect.value : '';
+    const isAnswered = status === ANSWERED;
+    const isWrongNumber = status === WRONG_NUMBER;
+    const isNoAnswer = NO_ANSWER.indexOf(status) !== -1;
+
+    if (wrongNumberFields) {
+      wrongNumberFields.classList.toggle('hidden', !isWrongNumber);
+      setContainerDisabled(wrongNumberFields, !isWrongNumber);
+      if (isWrongNumber) {
+        setFieldRequired(document.getElementById('wrong_number_type'), true);
+        setFieldRequired(document.getElementById('wrong_number_notes'), true);
+      }
+    }
+
+    if (detailFields) {
+      detailFields.classList.toggle('hidden', isWrongNumber || isNoAnswer);
+      setContainerDisabled(detailFields, isWrongNumber || isNoAnswer);
+    }
+
+    if (unansweredNote) {
+      unansweredNote.classList.toggle('hidden', !isNoAnswer);
+    }
+
+    if (callHint) {
+      if (isAnswered) {
+        callHint.textContent = 'تماس برقرار شد — تکمیل همه فیلدهای زیر الزامی است.';
+        callHint.classList.remove('hidden', 'text-amber-700');
+        callHint.classList.add('text-emerald-700');
+      } else if (isWrongNumber) {
+        callHint.textContent = 'شماره اشتباه — فقط «نوع خطای شماره» و «توضیحات» الزامی است.';
+        callHint.classList.remove('hidden', 'text-emerald-700');
+        callHint.classList.add('text-amber-700');
+      } else if (isNoAnswer) {
+        callHint.textContent = 'تماس برقرار نشد — فیلدهای ارزیابی اختیاری هستند.';
+        callHint.classList.remove('hidden', 'text-emerald-700');
+        callHint.classList.add('text-amber-700');
+      } else {
+        callHint.classList.add('hidden');
+      }
+    }
+
+    if (isAnswered && detailFields) {
+      detailFields.querySelectorAll('.sdr-required-when-answered select, .sdr-required-when-answered textarea').forEach(function (el) {
+        setFieldRequired(el, true);
+      });
+      toggleRejection();
+      toggleFollowup();
+      toggleContactName();
+    }
+  }
+
+  function toggleRejection() {
+    const show = resultSelect && resultSelect.value === 'رد شده' && callStatusSelect.value === ANSWERED;
+    rejectionWrap.classList.toggle('hidden', !show);
+    const ta = rejectionWrap.querySelector('textarea');
+    setFieldRequired(ta, show);
+  }
+
+  function toggleFollowup() {
+    const show = nextActionSelect && nextActionSelect.value === 'تماس بعدی در تاریخ مشخص' && callStatusSelect.value === ANSWERED;
+    followupWrap.classList.toggle('hidden', !show);
+    const inp = followupWrap.querySelector('input');
+    setFieldRequired(inp, show);
+  }
+
+  function toggleContactName() {
+    const show = contactPersonSelect
+      && ['مدیر', 'مالک', 'کارمند'].indexOf(contactPersonSelect.value) !== -1
+      && callStatusSelect
+      && callStatusSelect.value === ANSWERED;
+    if (contactNameWrap) {
+      contactNameWrap.classList.toggle('hidden', !show);
+    }
+    setFieldRequired(contactNameInput, show);
+  }
+
+  if (callStatusSelect) {
+    callStatusSelect.addEventListener('change', toggleCallStatusMode);
+    toggleCallStatusMode();
+  }
+  if (resultSelect) {
+    resultSelect.addEventListener('change', toggleRejection);
+    toggleRejection();
+  }
+  if (nextActionSelect) {
+    nextActionSelect.addEventListener('change', toggleFollowup);
+    toggleFollowup();
+  }
+  if (contactPersonSelect) {
+    contactPersonSelect.addEventListener('change', toggleContactName);
+    toggleContactName();
+  }
+})();
+</script>
+{% endblock %}

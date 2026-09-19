@@ -1,0 +1,66 @@
+<div class="rating-modal-inner">
+  <div class="mb-4 flex items-start justify-between gap-4 border-b border-indigo-100 pb-4">
+    <div>
+      <h2 class="text-xl font-bold text-slate-900">جدول امتیازات</h2>
+      <p class="mt-1 text-xs text-slate-500">
+        امتیاز پس از تأیید جلسه حضوری (+۱ LH و +۱ SDR) · تاریخ: {{ jalali_today_label }}
+      </p>
+    </div>
+    <button type="button"
+            id="rating-modal-close"
+            class="shrink-0 rounded-lg border border-slate-200 p-2 text-slate-500 hover:bg-slate-100"
+            aria-label="بستن">
+      <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  {% if current_user.role in ('lh', 'sdr', 'setter', 'pm', 'closer') %}
+  <div class="mb-4 rounded-xl bg-indigo-600 px-4 py-3 text-center text-white">
+    <p class="text-xs opacity-90">امتیاز شما</p>
+    <p class="text-2xl font-bold">{{ rating_board.my_score }}</p>
+    {% if rating_board.my_rank %}
+    <p class="text-xs opacity-90">رتبه کلی: {{ rating_board.my_rank }}</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="max-h-[60vh] overflow-y-auto">
+    <table class="min-w-full text-sm">
+      <thead class="sticky top-0 bg-slate-50">
+        <tr>
+          <th class="px-3 py-2 text-right font-medium text-slate-600">رتبه</th>
+          <th class="px-3 py-2 text-right font-medium text-slate-600">نام کاربری</th>
+          <th class="px-3 py-2 text-right font-medium text-slate-600">نقش</th>
+          <th class="px-3 py-2 text-right font-medium text-slate-600">امتیاز</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for agent in rating_board.agents %}
+        <tr class="{% if agent.id == current_user.id %}bg-indigo-50{% endif %}">
+          <td class="px-3 py-2">
+            <span class="inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold
+              {% if loop.index == 1 %}bg-amber-400 text-amber-950
+              {% elif loop.index == 2 %}bg-slate-300 text-slate-800
+              {% elif loop.index == 3 %}bg-amber-700/80 text-amber-50
+              {% else %}bg-slate-100 text-slate-600{% endif %}">
+              {% if loop.index == 1 %}🥇
+              {% elif loop.index == 2 %}🥈
+              {% elif loop.index == 3 %}🥉
+              {% else %}{{ loop.index }}{% endif %}
+            </span>
+          </td>
+          <td class="px-3 py-2 font-medium text-slate-800">{{ agent.username }}</td>
+          <td class="px-3 py-2 text-slate-600">{{ ROLE_LABELS.get(agent.role, agent.role) }}</td>
+          <td class="px-3 py-2 font-bold text-indigo-700">{{ agent.score }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="4" class="px-3 py-8 text-center text-slate-500">کاربری برای نمایش وجود ندارد.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

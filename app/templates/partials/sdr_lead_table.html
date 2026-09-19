@@ -1,0 +1,67 @@
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">نام کسب‌وکار</th>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">تماس</th>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">نوع</th>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">منبع</th>
+          {% if show_followup_date %}
+          <th class="px-4 py-3 text-right font-medium text-slate-600">تاریخ پیگیری</th>
+          {% endif %}
+          {% if show_status %}
+          <th class="px-4 py-3 text-right font-medium text-slate-600">وضعیت تماس</th>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">نتیجه</th>
+          {% endif %}
+          <th class="px-4 py-3 text-right font-medium text-slate-600">عملیات</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for lead in leads %}
+        <tr class="hover:bg-slate-50 {% if lead.needs_sdr_proposal_followup %}bg-emerald-50/60{% elif lead.is_sdr_uncalled_carryover %}bg-amber-50/80{% endif %}">
+          <td class="px-4 py-3 font-medium">
+            {{ lead.company_name }}
+            {% if lead.is_sdr_uncalled_carryover %}
+            <span class="mt-1 block rounded-md border border-amber-300 bg-amber-100 px-2 py-1 text-xs font-medium text-amber-900">
+              ⚠️ تماس گرفته نشده - ثبت شده در تاریخ: {{ format_jalali_datetime(lead.sdr_queue_since) }}
+            </span>
+            {% endif %}
+            {% if lead.needs_sdr_proposal_followup %}
+            <span class="mr-1 inline-block rounded-full bg-emerald-500 px-2 py-0.5 text-xs text-white">پروپوزال آماده — پیگیری</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3 text-xs" dir="ltr">{{ lead.phones_display }}</td>
+          <td class="px-4 py-3">{{ lead.business_type_display }}</td>
+          <td class="px-4 py-3">{{ lead.source_display }}</td>
+          {% if show_followup_date %}
+          <td class="px-4 py-3 text-indigo-700">
+            {{ lead.sdr_followup_date.strftime('%Y/%m/%d') if lead.sdr_followup_date else '—' }}
+          </td>
+          {% endif %}
+          {% if show_status %}
+          <td class="px-4 py-3">{{ lead.sdr_call_status or '—' }}</td>
+          <td class="px-4 py-3">{{ lead.sdr_result or '—' }}</td>
+          {% endif %}
+          <td class="px-4 py-3">
+            {% if action == 'process' %}
+            <a href="{{ url_for('sdr.process_lead', lead_id=lead.id) }}"
+               class="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700">
+              {{ 'ویرایش / تماس مجدد' if show_status else 'ثبت تماس' }}
+            </a>
+            {% elif action == 'view' %}
+            <span class="text-xs text-slate-400">آرشیو</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8" class="px-4 py-8 text-center text-slate-500">
+            {{ empty_message }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

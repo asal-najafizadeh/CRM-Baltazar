@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}آمار کل پیگیری‌ها{% endblock %}
+
+{% block sidebar_nav %}
+{% include "admin/_sidebar_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<section class="space-y-4">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900">آمار کل پیگیری‌ها</h1>
+    <p class="text-sm text-slate-500">لیست کامل پیگیری‌های پروپوزال و تماس مجدد با تاریخ‌های برنامه‌ریزی شده</p>
+  </div>
+  <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200 text-sm">
+        <thead class="bg-slate-50">
+          <tr>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">کسب‌وکار</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">نوع پیگیری</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">تاریخ پیگیری</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">وضعیت</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">عامل</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for lead in leads %}
+          <tr>
+            <td class="px-4 py-3 font-medium">{{ lead.company_name }}</td>
+            <td class="px-4 py-3">
+              {% if lead.sdr_routed_to_pm and lead.pm_proposal_ready %}پروپوزال آماده{% elif lead.sdr_followup_date %}تماس مجدد SDR{% elif lead.closer_followup_date %}پیگیری مجدد Closer{% else %}—{% endif %}
+            </td>
+            <td class="px-4 py-3">
+              {% if lead.sdr_followup_date %}{{ format_jalali_date(lead.sdr_followup_date) }}{% elif lead.closer_followup_date %}{{ format_jalali_datetime(lead.closer_followup_date) }}{% else %}—{% endif %}
+            </td>
+            <td class="px-4 py-3">{{ lead.stage_label }}</td>
+            <td class="px-4 py-3">{{ lead.sdr_agent_username if lead.sdr_followup_date else lead.closer_agent_username }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="px-4 py-8 text-center text-slate-500">پیگیری فعالی ثبت نشده است.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

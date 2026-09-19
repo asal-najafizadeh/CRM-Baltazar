@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}مدیریت کل لیدها — Baltazar CRM{% endblock %}
+
+{% block sidebar_nav %}
+{% include "admin/_sidebar_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900">مدیریت کل لیدها</h1>
+    <p class="mt-1 text-slate-600">نمای جامع تمام سرنخ‌های ثبت‌شده در سیستم</p>
+  </div>
+  <span class="rounded-full bg-indigo-100 px-4 py-1.5 text-sm font-medium text-indigo-800">
+    {{ leads|length }} سرنخ
+  </span>
+</div>
+
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">نام کسب‌وکار</th>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">شماره تماس</th>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">نوع کسب‌وکار</th>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">تاریخ ثبت</th>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">مرحله / وضعیت</th>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">کارشناسان</th>
+          <th class="px-4 py-3 text-right font-medium text-slate-600">عملیات</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for lead in leads %}
+        <tr class="hover:bg-slate-50/80">
+          <td class="px-4 py-3 font-medium text-slate-900">{{ lead.company_name }}</td>
+          <td class="px-4 py-3 font-mono text-slate-800" dir="ltr">{{ lead.phone_number }}</td>
+          <td class="px-4 py-3 text-slate-700">{{ lead.business_type_display }}</td>
+          <td class="px-4 py-3 text-slate-500 whitespace-nowrap">
+            {{ format_jalali_date(lead.created_at.date() if lead.created_at else None) }}
+          </td>
+          <td class="px-4 py-3">
+            <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium
+              {% if lead.pipeline_status == 'closed_won' %}bg-emerald-100 text-emerald-800
+              {% elif lead.pipeline_status == 'closed_lost' %}bg-red-100 text-red-800
+              {% elif lead.pipeline_status == 'disqualified' %}bg-amber-100 text-amber-800
+              {% else %}bg-indigo-50 text-indigo-800{% endif %}">
+              {{ lead.master_status_display }}
+            </span>
+          </td>
+          <td class="px-4 py-3 text-xs text-slate-600">
+            <div class="flex flex-col gap-1">
+              <span><span class="text-slate-400">LH:</span> {{ lead.lh_creator_username }}</span>
+              <span><span class="text-slate-400">SDR:</span> {{ lead.assigned_sdr_username }}</span>
+              {% if lead.sdr_agent_username != '—' and lead.sdr_agent_username != lead.assigned_sdr_username %}
+              <span><span class="text-slate-400">تماس SDR:</span> {{ lead.sdr_agent_username }}</span>
+              {% endif %}
+              <span><span class="text-slate-400">ستر:</span> {{ lead.setter_agent_username }}</span>
+              <span><span class="text-slate-400">کلوزر:</span> {{ lead.closer_agent_username }}</span>
+            </div>
+          </td>
+          <td class="px-4 py-3">
+            {% include "partials/admin_lead_row_actions.html" %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="px-4 py-12 text-center text-slate-500">
+            هنوز سرنخی در سیستم ثبت نشده است.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% include "partials/admin_lead_crud_shell.html" %}
+{% endblock %}

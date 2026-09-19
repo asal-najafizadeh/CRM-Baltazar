@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "partials/form_field.html" import render_field %}
+{% block title %}ورود — Baltazar CRM{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-md">
+  <div class="rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
+    <h1 class="mb-2 text-2xl font-bold text-slate-900">ورود به سیستم</h1>
+    <p class="mb-6 text-sm text-slate-500">سیستم مدیریت ارتباط با مشتری Baltazar</p>
+    <form method="post" class="space-y-4">
+      {{ form.hidden_tag() }}
+      {{ render_field(form.username) }}
+      {{ render_field(form.password) }}
+      {{ form.submit(class="w-full cursor-pointer rounded-lg bg-indigo-600 px-4 py-2.5 font-medium text-white hover:bg-indigo-700") }}
+    </form>
+    <p class="mt-6 text-center text-xs text-slate-500">
+      برای تست: ابتدا <code class="rounded bg-slate-100 px-1" dir="ltr">python seed.py</code> را اجرا کنید.
+    </p>
+  </div>
+</div>
+{% endblock %}

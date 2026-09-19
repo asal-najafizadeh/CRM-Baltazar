@@ -1,0 +1,64 @@
+{# محتوای مودال جزئیات کامل لید — include با lead #}
+<div class="space-y-5 text-sm">
+  <section class="rounded-lg border border-slate-200 p-4">
+    <h4 class="mb-2 font-bold text-slate-900">اطلاعات LH</h4>
+    <div class="grid gap-2 sm:grid-cols-2">
+      <p><span class="text-slate-500">کسب‌وکار:</span> {{ lead.company_name }}</p>
+      <p><span class="text-slate-500">تماس:</span> <span dir="ltr">{{ lead.phones_display }}</span></p>
+      <p><span class="text-slate-500">نوع کسب‌وکار:</span> {{ lead.business_type_display }}</p>
+      <p><span class="text-slate-500">منبع:</span> {{ lead.source_display }}</p>
+      <p><span class="text-slate-500">ثبت‌کننده:</span> {{ lead.lh_creator_username }}</p>
+      <p><span class="text-slate-500">تاریخ ثبت:</span> {{ format_jalali_datetime(lead.created_at) }}</p>
+    </div>
+    <p class="mt-2"><span class="text-slate-500">آدرس:</span> {{ lead.address or '—' }}</p>
+    <p class="mt-1"><span class="text-slate-500">توضیحات اولیه:</span> {{ lead.description or '—' }}</p>
+  </section>
+  <section class="rounded-lg border border-indigo-200 p-4">
+    <h4 class="mb-2 font-bold text-indigo-900">اطلاعات SDR</h4>
+    <div class="grid gap-2 sm:grid-cols-2">
+      <p><span class="text-slate-500">SDR اختصاصی:</span> {{ lead.assigned_sdr_username }}</p>
+      <p><span class="text-slate-500">عامل تماس:</span> {{ lead.sdr_agent_username }}</p>
+      <p><span class="text-slate-500">وضعیت تماس:</span> {{ lead.sdr_call_status or '—' }}</p>
+      <p><span class="text-slate-500">نتیجه:</span> {{ lead.sdr_result or '—' }}</p>
+      <p><span class="text-slate-500">شدت مشکل:</span> {{ lead.sdr_pain_severity or '—' }}</p>
+      <p><span class="text-slate-500">قدرت خرید:</span> {{ lead.sdr_buying_power or '—' }}</p>
+      <p><span class="text-slate-500">تصمیم‌گیرنده:</span> {{ lead.sdr_contact_person or '—' }}{% if lead.sdr_contact_name %} - نام: {{ lead.sdr_contact_name }}{% endif %}</p>
+      <p><span class="text-slate-500">سطح علاقه‌مندی:</span> {{ lead.sdr_interest_level or '—' }}</p>
+      <p><span class="text-slate-500">اقدام بعدی:</span> {{ lead.sdr_next_action or '—' }}</p>
+      <p><span class="text-slate-500">تاریخ پیگیری:</span> {{ format_jalali_date(lead.sdr_followup_date) }}</p>
+    </div>
+    <p class="mt-2"><span class="text-slate-500">خلاصه مکالمه:</span> {{ lead.sdr_summary or '—' }}</p>
+  </section>
+  <section class="rounded-lg border border-violet-200 p-4">
+    <h4 class="mb-2 font-bold text-violet-900">اطلاعات Setter</h4>
+    <div class="grid gap-2 sm:grid-cols-2">
+      <p><span class="text-slate-500">Setter:</span> {{ lead.setter_agent_username }}</p>
+      <p><span class="text-slate-500">وضعیت:</span> {{ lead.setter_status or '—' }}</p>
+      <p><span class="text-slate-500">زمان جلسه:</span> {{ format_jalali_datetime(lead.setter_meeting_date) }}</p>
+      <p><span class="text-slate-500">مکان:</span> {{ lead.setter_meeting_location or '—' }}</p>
+    </div>
+    <p class="mt-2"><span class="text-slate-500">یادداشت:</span> {{ lead.setter_notes or '—' }}</p>
+  </section>
+  <section class="rounded-lg border border-emerald-200 p-4">
+    <h4 class="mb-2 font-bold text-emerald-900">اطلاعات PM</h4>
+    <div class="grid gap-2 sm:grid-cols-2">
+      <p><span class="text-slate-500">عامل PM:</span> {{ lead.pm_agent.username if lead.pm_agent else '—' }}</p>
+      <p><span class="text-slate-500">عنوان پروپوزال:</span> {{ lead.proposal_title or '—' }}</p>
+      <p><span class="text-slate-500">مبلغ:</span> {{ "{:,.0f}".format(lead.proposal_amount) if lead.proposal_amount else '—' }}</p>
+      <p><span class="text-slate-500">تاریخ:</span> {{ format_jalali_date(lead.proposal_date) }}</p>
+    </div>
+    <p class="mt-2"><span class="text-slate-500">جزئیات:</span> {{ lead.proposal_details or '—' }}</p>
+  </section>
+  <section class="rounded-lg border border-teal-200 p-4">
+    <h4 class="mb-2 font-bold text-teal-900">اطلاعات Closer</h4>
+    <div class="grid gap-2 sm:grid-cols-2">
+      <p><span class="text-slate-500">Closer:</span> {{ lead.closer_agent_username }}</p>
+      <p><span class="text-slate-500">وضعیت جلسه:</span> {{ lead.closer_meeting_status or '—' }}</p>
+      <p><span class="text-slate-500">وضعیت همکاری:</span> {{ lead.closer_cooperation_status or '—' }}</p>
+      <p><span class="text-slate-500">پیگیری:</span> {{ format_jalali_datetime(lead.closer_followup_date) }}</p>
+      <p><span class="text-slate-500">نتیجه قرارداد:</span> {{ lead.deal_outcome or '—' }}</p>
+      <p><span class="text-slate-500">بسته‌شدن:</span> {{ format_jalali_datetime(lead.closed_at) }}</p>
+    </div>
+    <p class="mt-2"><span class="text-slate-500">یادداشت‌ها:</span> {{ lead.closer_notes or '—' }}</p>
+  </section>
+</div>

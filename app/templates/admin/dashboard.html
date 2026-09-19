@@ -1,0 +1,386 @@
+{% extends "base.html" %}
+{% block title %}داشبورد مدیریت — Baltazar CRM{% endblock %}
+
+{% block sidebar_nav %}
+{% include "admin/_sidebar_nav.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+  <div>
+    <h1 class="text-2xl font-bold text-slate-900">داشبورد مدیریت</h1>
+    <p class="text-slate-600">همه سرنخ‌ها، آمار مراحل و مدیریت کاربران</p>
+  </div>
+  <a href="{{ url_for('admin.create_user') }}"
+     class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+    + کاربر جدید
+  </a>
+</div>
+
+<section class="mb-8">
+  <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
+    <div>
+      <h2 class="text-lg font-semibold text-slate-900">آمار کل دوره + آمار امروز</h2>
+      <p class="text-sm text-slate-500">اعداد اصلی کارت‌ها مربوط به کل دوره هستند و زیرشاخص هر کارت وضعیت امروز را نمایش می‌دهد.</p>
+    </div>
+  </div>
+  <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    {% for metric in hybrid_metrics %}
+      {% set card_cls = "rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md" %}
+      {% if metric.endpoint %}
+        <a href="{{ url_for(metric.endpoint) }}" class="{{ card_cls }}">
+      {% else %}
+        <div class="{{ card_cls }}">
+      {% endif %}
+        <p class="text-sm text-slate-500">{{ metric.title }}</p>
+        <p class="mt-1 text-3xl font-bold {{ metric.color }}">{{ to_persian_digits(metric.total) }}</p>
+        <p class="mt-2 text-xs text-slate-500">{{ metric_subtitle(metric.today) }}</p>
+        {% if metric.breakdown_total %}
+          <p class="mt-1 text-xs text-slate-500">{{ metric.breakdown_total }}</p>
+        {% endif %}
+        {% if metric.breakdown_today %}
+          <p class="mt-1 text-xs text-slate-500">{{ metric.breakdown_today }}</p>
+        {% endif %}
+      {% if metric.endpoint %}
+        </a>
+      {% else %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+<section class="mb-8 rounded-xl border border-indigo-100 bg-indigo-50/40 p-6">
+  <h2 class="text-lg font-semibold text-slate-900">دریافت گزارش روزانه</h2>
+  <p class="mt-1 text-sm text-slate-600">
+    گزارش چاپی شامل تمام شاخص‌های بالا برای {{ daily.jalali_date_label }}
+  </p>
+  <div class="mt-4 flex flex-wrap gap-3">
+    <a href="{{ url_for('admin.daily_report') }}?autoprint=1"
+       target="_blank"
+       rel="noopener"
+       class="inline-flex items-center rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-indigo-700">
+      تولید و چاپ گزارش امروز
+    </a>
+    <a href="{{ url_for('admin.employee_daily_report') }}?autoprint=1"
+       target="_blank"
+       rel="noopener"
+       class="inline-flex items-center rounded-lg border border-indigo-300 bg-white px-5 py-2.5 text-sm font-medium text-indigo-800 hover:bg-indigo-50">
+      گزارش عملکرد روزانه کارمندان
+    </a>
+  </div>
+</section>
+
+<section class="mb-8 rounded-xl border border-emerald-100 bg-emerald-50/40 p-6">
+  <h2 class="text-lg font-semibold text-slate-900">خروجی جامع اکسل</h2>
+  <p class="mt-1 text-sm text-slate-600">
+    دانلود فایل‌های اکسل با سرتیتر فارسی — تاریخ امروز: {{ daily.jalali_date_label }}
+  </p>
+  <div class="mt-4 flex flex-wrap gap-3">
+    <a href="{{ url_for('admin.export_excel_master') }}"
+       class="inline-flex items-center rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-700">
+      دانلود اکسل کل دیتابیس (Master Export)
+    </a>
+    <a href="{{ url_for('admin.export_excel_sdr') }}"
+       class="inline-flex items-center rounded-lg border border-emerald-300 bg-white px-4 py-2.5 text-sm font-medium text-emerald-800 hover:bg-emerald-50">
+      دانلود اکسل بخش SDR
+    </a>
+    <a href="{{ url_for('admin.export_excel_setter') }}"
+       class="inline-flex items-center rounded-lg border border-emerald-300 bg-white px-4 py-2.5 text-sm font-medium text-emerald-800 hover:bg-emerald-50">
+      دانلود اکسل بخش Setter
+    </a>
+    <a href="{{ url_for('admin.export_excel_closer') }}"
+       class="inline-flex items-center rounded-lg border border-emerald-300 bg-white px-4 py-2.5 text-sm font-medium text-emerald-800 hover:bg-emerald-50">
+      دانلود اکسل بخش Closer
+    </a>
+  </div>
+</section>
+
+<section class="mb-10">
+  <h2 class="mb-4 text-lg font-semibold">مدیریت کاربران</h2>
+  <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200 text-sm">
+        <thead class="bg-slate-50">
+          <tr>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">نام کاربری</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">نقش</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">رمز عبور</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">وضعیت</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">آنالیز عملکرد</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">عملیات</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for user in users %}
+          <tr class="{% if not user.is_active %}bg-slate-50{% endif %}">
+            <td class="px-4 py-3 font-medium">
+              {{ user.username }}
+              {% if user.id == current_user.id %}
+                <span class="mr-1 text-xs text-slate-400">(شما)</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3">{{ ROLE_LABELS.get(user.role, user.role) }}</td>
+            <td class="px-4 py-3">
+              {% if user.password_plain %}
+              <div class="relative flex items-center gap-1">
+                <span class="password-copy-tooltip absolute -top-9 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-md bg-emerald-600 px-2 py-1 text-xs font-medium text-white shadow-lg">
+                  رمز عبور کپی شد
+                </span>
+                <span class="password-blur-display select-all font-mono text-sm text-slate-800 transition-[filter] duration-300"
+                      data-password="{{ user.password_plain }}"
+                      dir="ltr">
+                  {% for _ in range(user.password_plain|length) %}•{% endfor %}
+                </span>
+                <button type="button"
+                        class="password-toggle-btn inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                        aria-label="نمایش / مخفی کردن رمز"
+                        title="نمایش رمز">
+                  <svg class="eye-open h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  <svg class="eye-closed hidden h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                  </svg>
+                </button>
+                <button type="button"
+                        class="password-copy-btn inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-indigo-50 hover:text-indigo-700"
+                        data-password="{{ user.password_plain }}"
+                        aria-label="کپی رمز عبور"
+                        title="کپی رمز">
+                  <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </button>
+              </div>
+              {% else %}
+              <span class="text-xs text-slate-400">— (کاربر قدیمی؛ seed مجدد یا کاربر جدید)</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3">
+              {% if user.is_active %}
+                <span class="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">فعال</span>
+              {% else %}
+                <span class="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">تعلیق‌شده</span>
+              {% endif %}
+            </td>
+            <td class="px-4 py-3">
+              <button type="button"
+                      class="user-analytics-btn rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-800 hover:bg-indigo-100"
+                      data-user-id="{{ user.id }}"
+                      data-username="{{ user.username }}">
+                آنالیز
+              </button>
+            </td>
+            <td class="px-4 py-3">
+              <div class="flex flex-wrap items-center gap-2">
+                {% if user.id != current_user.id %}
+                <form method="post"
+                      action="{{ url_for('admin.toggle_user_active', user_id=user.id) }}"
+                      class="inline">
+                  {% include "partials/csrf_input.html" %}
+                  <button type="submit"
+                          class="rounded-lg border px-3 py-1.5 text-xs font-medium transition
+                          {% if user.is_active %}
+                            border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100
+                          {% else %}
+                            border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100
+                          {% endif %}">
+                    {% if user.is_active %}تعلیق{% else %}فعال‌سازی{% endif %}
+                  </button>
+                </form>
+                <form method="post"
+                      action="{{ url_for('admin.delete_user', user_id=user.id) }}"
+                      class="inline"
+                      onsubmit="return confirm('آیا از حذف این کاربر مطمئن هستید؟');">
+                  {% include "partials/csrf_input.html" %}
+                  <button type="submit"
+                          class="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100">
+                    حذف کاربر
+                  </button>
+                </form>
+                <a href="{{ url_for('admin.edit_user', user_id=user.id) }}"
+                   class="rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-800 hover:bg-indigo-100">
+                  ویرایش کاربر
+                </a>
+                {% else %}
+                <span class="text-xs text-slate-400">—</span>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="mb-10">
+  <h2 class="mb-4 text-lg font-semibold">مدیریت کل لیدها</h2>
+  <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200 text-sm">
+        <thead class="bg-slate-50">
+          <tr>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">کسب‌وکار</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">تماس</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">ثبت‌شده توسط</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">مرحله</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">وضعیت</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">به‌روزرسانی</th>
+            <th class="px-4 py-3 text-right font-medium text-slate-600">عملیات</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for lead in leads %}
+          <tr class="hover:bg-slate-50/80">
+            <td class="px-4 py-3 font-medium">{{ lead.company_name }}</td>
+            <td class="px-4 py-3 text-xs" dir="ltr">{{ lead.phones_display }}</td>
+            <td class="px-4 py-3">
+              <span class="text-slate-700">ثبت شده توسط:</span>
+              <span class="font-medium text-indigo-700">{{ lead.lh_creator_username }}</span>
+            </td>
+            <td class="px-4 py-3">{{ lead.stage_label }}</td>
+            <td class="px-4 py-3">{{ PIPELINE_STATUS_LABELS.get(lead.pipeline_status, lead.pipeline_status) }}</td>
+            <td class="px-4 py-3 text-slate-500">{{ format_jalali_datetime(lead.updated_at) }}</td>
+            <td class="px-4 py-3">
+              {% include "partials/admin_lead_row_actions.html" %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7" class="px-4 py-8 text-center text-slate-500">سرنخی ثبت نشده است.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+{% include "partials/admin_lead_crud_shell.html" %}
+
+<div id="analytics-modal-backdrop"
+     class="fixed inset-0 z-[110] hidden items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
+  <div class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+    <div class="mb-4 flex items-start justify-between gap-3 border-b border-slate-100 pb-3">
+      <div>
+        <h3 id="analytics-modal-title" class="text-lg font-bold text-slate-900">آنالیز عملکرد</h3>
+        <p id="analytics-modal-subtitle" class="text-sm text-slate-500"></p>
+      </div>
+      <button type="button" id="analytics-modal-close"
+              class="rounded-lg border border-slate-200 p-2 text-slate-500 hover:bg-slate-100"
+              aria-label="بستن">✕</button>
+    </div>
+    <div id="analytics-modal-body" class="space-y-4 text-sm">
+      <p class="text-center text-slate-500">در حال بارگذاری...</p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+  const analyticsBackdrop = document.getElementById('analytics-modal-backdrop');
+  const analyticsBody = document.getElementById('analytics-modal-body');
+  const analyticsTitle = document.getElementById('analytics-modal-title');
+  const analyticsSubtitle = document.getElementById('analytics-modal-subtitle');
+  const analyticsClose = document.getElementById('analytics-modal-close');
+  const analyticsUrlTemplate = {{ url_for('admin.user_analytics', user_id=0)|tojson }};
+
+  function analyticsUrlFor(userId) {
+    return analyticsUrlTemplate.replace('/0/', '/' + userId + '/');
+  }
+
+  function closeAnalyticsModal() {
+    analyticsBackdrop.classList.remove('flex');
+    analyticsBackdrop.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function openAnalyticsModal(userId, username) {
+    analyticsBackdrop.classList.remove('hidden');
+    analyticsBackdrop.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    analyticsTitle.textContent = 'آنالیز عملکرد';
+    analyticsSubtitle.textContent = username;
+    analyticsBody.innerHTML = '<p class="py-6 text-center text-slate-500">در حال بارگذاری...</p>';
+    fetch(analyticsUrlFor(userId))
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.error) {
+          analyticsBody.innerHTML = '<p class="text-red-600">' + data.error + '</p>';
+          return;
+        }
+        var html = '<p class="text-xs text-slate-500">نقش: <span class="font-medium text-slate-800">' + (data.role_label || '') + '</span></p>';
+        if (data.unsupported) {
+          html += '<p class="mt-4 text-amber-700">برای این نقش شاخص اختصاصی تعریف نشده است.</p>';
+        } else {
+          html += '<div class="mt-4 grid gap-3">';
+          html += '<div class="rounded-xl border border-emerald-100 bg-emerald-50/50 p-4"><p class="text-xs text-emerald-800">' + data.today_label + '</p><p class="mt-1 text-3xl font-bold text-emerald-700">' + data.today_count + '</p></div>';
+          html += '<div class="rounded-xl border border-indigo-100 bg-indigo-50/50 p-4"><p class="text-xs text-indigo-800">' + data.total_label + '</p><p class="mt-1 text-3xl font-bold text-indigo-700">' + data.total_count + '</p></div>';
+          html += '</div>';
+        }
+        analyticsBody.innerHTML = html;
+      })
+      .catch(function () {
+        analyticsBody.innerHTML = '<p class="text-red-600">خطا در دریافت آنالیز.</p>';
+      });
+  }
+
+  document.querySelectorAll('.user-analytics-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      openAnalyticsModal(btn.getAttribute('data-user-id'), btn.getAttribute('data-username'));
+    });
+  });
+  if (analyticsClose) analyticsClose.addEventListener('click', closeAnalyticsModal);
+  if (analyticsBackdrop) {
+    analyticsBackdrop.addEventListener('click', function (e) {
+      if (e.target === analyticsBackdrop) closeAnalyticsModal();
+    });
+  }
+
+  function showCopyTooltip(wrap) {
+    const tip = wrap.querySelector('.password-copy-tooltip');
+    if (!tip) return;
+    tip.classList.add('show');
+    setTimeout(function () { tip.classList.remove('show'); }, 2000);
+  }
+
+  document.querySelectorAll('.password-toggle-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const wrap = btn.closest('.relative');
+      const display = wrap.querySelector('.password-blur-display');
+      const open = btn.querySelector('.eye-open');
+      const closed = btn.querySelector('.eye-closed');
+      const plain = display.getAttribute('data-password') || '';
+      const isRevealed = display.classList.toggle('revealed');
+      display.textContent = isRevealed ? plain : (plain ? '•'.repeat(plain.length) : '—');
+      open.classList.toggle('hidden', isRevealed);
+      closed.classList.toggle('hidden', !isRevealed);
+    });
+  });
+
+  document.querySelectorAll('.password-copy-btn').forEach(function (btn) {
+    btn.addEventListener('click', async function () {
+      const plain = btn.getAttribute('data-password') || '';
+      const wrap = btn.closest('.relative');
+      try {
+        await navigator.clipboard.writeText(plain);
+        showCopyTooltip(wrap);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = plain;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showCopyTooltip(wrap);
+      }
+    });
+  });
+})();
+</script>
+{% endblock %}

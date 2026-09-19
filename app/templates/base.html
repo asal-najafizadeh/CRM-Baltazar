@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" class="h-full bg-slate-50">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Baltazar CRM{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @font-face {
+      font-family: 'Dana';
+      src: url("{{ url_for('static', filename='fonts/Dana-Black.ttf') }}") format('truetype');
+      font-weight: 900;
+      font-style: normal;
+      font-display: swap;
+    }
+    html, body {
+      font-family: 'Dana', sans-serif;
+    }
+    .password-blur-display:not(.revealed) {
+      filter: blur(5px);
+    }
+    .password-blur-display.revealed {
+      filter: none;
+    }
+    .password-copy-tooltip {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .password-copy-tooltip.show {
+      opacity: 1;
+    }
+    #live-clock-time,
+    #live-clock-date {
+      font-family: 'Dana', sans-serif !important;
+    }
+    #rating-modal-backdrop.open {
+      display: flex;
+    }
+  </style>
+  {% if current_user.is_authenticated %}
+  <link rel="stylesheet" href="https://unpkg.com/@majidh1/jalalidatepicker/dist/jalalidatepicker.min.css">
+  {% endif %}
+</head>
+<body class="h-full min-h-screen text-slate-800">
+  <div class="flex min-h-screen">
+    {% if current_user.is_authenticated %}
+    <aside class="hidden w-56 shrink-0 border-l border-slate-200 bg-white md:block">
+      <div class="sticky top-0 flex h-screen flex-col p-4">
+        <a href="{{ url_for('index') }}" class="mb-6 text-lg font-bold text-indigo-700">
+          Baltazar CRM
+        </a>
+        <p class="mb-4 text-xs text-slate-500">
+          نقش:
+          <span class="font-medium text-slate-700">
+            {{ ROLE_LABELS.get(current_user.role, current_user.role) }}
+          </span>
+        </p>
+        <nav class="flex flex-1 flex-col gap-1 text-sm">
+          <a href="{{ url_for('search.search_leads') }}"
+             class="rounded-lg px-3 py-2 font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100">
+            جستجوی سرنخ‌ها
+          </a>
+          {% block sidebar_nav %}
+          {% if current_user.role == 'admin' %}
+            {% include "admin/_sidebar_nav.html" %}
+          {% elif current_user.role == 'lh' %}
+            <a href="{{ url_for('lh.dashboard') }}" class="rounded-lg px-3 py-2 hover:bg-slate-100">داشبورد LH</a>
+          {% elif current_user.role == 'sdr' %}
+            <a href="{{ url_for('sdr.dashboard') }}" class="rounded-lg px-3 py-2 hover:bg-slate-100">داشبورد SDR</a>
+          {% elif current_user.role == 'setter' %}
+            <a href="{{ url_for('setter.dashboard') }}" class="rounded-lg px-3 py-2 hover:bg-slate-100">داشبورد ستر</a>
+          {% elif current_user.role == 'pm' %}
+            <a href="{{ url_for('pm.dashboard') }}" class="rounded-lg px-3 py-2 hover:bg-slate-100">داشبورد PM</a>
+          {% elif current_user.role == 'closer' %}
+            <a href="{{ url_for('closer.dashboard') }}" class="rounded-lg px-3 py-2 hover:bg-slate-100">داشبورد کلوزر</a>
+          {% endif %}
+          {% endblock %}
+        </nav>
+        <a href="{{ url_for('auth.logout') }}"
+           class="mt-auto rounded-lg border border-slate-200 px-3 py-2 text-center text-sm text-red-600 hover:bg-red-50">
+          خروج از حساب
+        </a>
+      </div>
+    </aside>
+    {% endif %}
+
+    <div class="flex min-w-0 flex-1 flex-col">
+      {% if current_user.is_authenticated %}
+      <header class="border-b border-slate-200 bg-gradient-to-l from-indigo-50 via-white to-white shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4 px-4 py-4 md:px-8">
+          <div class="flex items-center gap-3 md:hidden">
+            <a href="{{ url_for('index') }}" class="text-lg font-bold text-indigo-700">Baltazar CRM</a>
+          </div>
+          <div class="flex flex-1 flex-col gap-1 md:items-start">
+            <p class="text-base font-semibold text-slate-800">
+              خوش آمدید،
+              <span class="text-indigo-700">{{ current_user.username }}</span>
+            </p>
+            <p class="text-xs text-slate-500">
+              {{ ROLE_LABELS.get(current_user.role, current_user.role) }}
+            </p>
+          </div>
+          <button type="button"
+                  id="open-rating-board"
+                  class="order-last w-full rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900 shadow-sm hover:bg-amber-100 md:order-none md:w-auto">
+            جدول امتیازات
+          </button>
+          {% if current_user.role == 'admin' %}
+          <a href="{{ url_for('admin.lead_distribution') }}"
+             class="order-last w-full rounded-lg border border-indigo-200 bg-indigo-50 px-4 py-2 text-center text-sm font-semibold text-indigo-800 shadow-sm hover:bg-indigo-100 md:order-none md:w-auto">
+            توزیع لیدهای امروز
+          </a>
+          {% endif %}
+          <div class="text-left" dir="ltr">
+            <div id="live-clock-time"
+                 class="text-2xl font-bold tabular-nums tracking-wide text-indigo-800">
+              --:--:--
+            </div>
+            <div id="live-clock-date"
+                 class="mt-1 text-sm font-medium tabular-nums text-slate-600"
+                 dir="ltr">
+              {{ jalali_today_label }}
+            </div>
+          </div>
+          <a href="{{ url_for('auth.logout') }}" class="md:hidden text-sm text-red-600">خروج</a>
+        </div>
+      </header>
+      {% else %}
+      <header class="border-b border-slate-200 bg-white md:hidden">
+        <div class="flex items-center justify-between px-4 py-3">
+          <a href="{{ url_for('index') }}" class="text-lg font-bold text-indigo-700">Baltazar CRM</a>
+        </div>
+      </header>
+      {% endif %}
+
+      <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-8 md:px-8">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="mb-6 space-y-2">
+              {% for category, message in messages %}
+                <div class="rounded-lg border px-4 py-3 text-sm
+                  {% if category == 'success' %}border-emerald-200 bg-emerald-50 text-emerald-800
+                  {% elif category == 'danger' %}border-red-200 bg-red-50 text-red-800
+                  {% elif category == 'warning' %}border-amber-200 bg-amber-50 text-amber-800
+                  {% else %}border-sky-200 bg-sky-50 text-sky-800{% endif %}">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  {% if current_user.is_authenticated %}
+  <div id="rating-modal-backdrop"
+       class="fixed inset-0 z-[100] hidden items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
+       aria-hidden="true">
+    <div class="relative w-full max-w-lg rounded-2xl border border-indigo-100 bg-white p-6 shadow-2xl"
+         role="dialog"
+         aria-labelledby="rating-modal-title">
+      <div id="rating-modal-body" class="text-sm text-slate-500">
+        در حال بارگذاری جدول امتیازات...
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/@majidh1/jalalidatepicker/dist/jalalidatepicker.min.js"></script>
+  <script>
+  (function () {
+    function updatePersianClock() {
+      const now = new Date();
+      const timeEl = document.getElementById('live-clock-time');
+      if (!timeEl) return;
+      timeEl.textContent = now.toLocaleTimeString('fa-IR', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      });
+    }
+    updatePersianClock();
+    setInterval(updatePersianClock, 1000);
+
+    if (window.jalaliDatepicker) {
+      jalaliDatepicker.startWatch({
+        separatorChars: { date: '/', between: ' ', time: ':' },
+        persianDigits: true,
+        time: true,
+        autoHide: true,
+        zIndex: 9999
+      });
+    }
+
+    const openBtn = document.getElementById('open-rating-board');
+    const backdrop = document.getElementById('rating-modal-backdrop');
+    const body = document.getElementById('rating-modal-body');
+    const modalUrl = {{ url_for('shared.rating_board_modal')|tojson }};
+
+    function closeRatingModal() {
+      if (!backdrop) return;
+      backdrop.classList.remove('open');
+      backdrop.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function openRatingModal() {
+      if (!backdrop || !body) return;
+      backdrop.classList.add('open');
+      backdrop.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      body.innerHTML = '<p class="py-8 text-center text-slate-500">در حال بارگذاری...</p>';
+      fetch(modalUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(function (r) { return r.text(); })
+        .then(function (html) {
+          body.innerHTML = html;
+          const closeBtn = document.getElementById('rating-modal-close');
+          if (closeBtn) closeBtn.addEventListener('click', closeRatingModal);
+        })
+        .catch(function () {
+          body.innerHTML = '<p class="py-8 text-center text-red-600">خطا در بارگذاری جدول امتیازات.</p>';
+        });
+    }
+
+    if (openBtn) openBtn.addEventListener('click', openRatingModal);
+    if (backdrop) {
+      backdrop.addEventListener('click', function (e) {
+        if (e.target === backdrop) closeRatingModal();
+      });
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeRatingModal();
+    });
+  })();
+  </script>
+  {% endif %}
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

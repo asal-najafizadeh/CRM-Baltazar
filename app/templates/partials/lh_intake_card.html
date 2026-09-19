@@ -1,0 +1,52 @@
+{# اطلاعات کامل ثبت‌شده توسط LH #}
+<div class="rounded-xl border-2 border-amber-200 bg-gradient-to-b from-amber-50/80 to-white p-6 shadow-sm">
+  <h3 class="mb-4 text-base font-bold text-amber-900">
+    اطلاعات اولیه کسب و کار (ثبت شده توسط LH)
+  </h3>
+  <dl class="space-y-3 text-sm">
+    <div class="flex flex-wrap justify-between gap-2 border-b border-amber-100/80 pb-2">
+      <dt class="font-medium text-slate-600">نام کسب و کار:</dt>
+      <dd class="font-bold text-slate-900">{{ lead.company_name }}</dd>
+    </div>
+    <div class="flex flex-wrap justify-between gap-2 border-b border-amber-100/80 pb-2">
+      <dt class="font-medium text-slate-600">شماره‌های تماس:</dt>
+      <dd class="font-medium text-slate-900" dir="ltr">{{ lead.phones_display }}</dd>
+    </div>
+    <div class="flex flex-wrap justify-between gap-2 border-b border-amber-100/80 pb-2">
+      <dt class="font-medium text-slate-600">نوع کسب و کار:</dt>
+      <dd class="text-slate-800">{{ lead.business_type_display }}</dd>
+    </div>
+    <div class="flex flex-wrap justify-between gap-2 border-b border-amber-100/80 pb-2">
+      <dt class="font-medium text-slate-600">منبع:</dt>
+      <dd class="text-slate-800">{{ lead.source_display }}</dd>
+    </div>
+    <div class="flex flex-wrap justify-between gap-2 border-b border-amber-100/80 pb-2">
+      <dt class="font-medium text-slate-600">آدرس سایت:</dt>
+      <dd class="break-all text-slate-800" dir="ltr">{{ lead.website or '—' }}</dd>
+    </div>
+    <div class="flex flex-wrap justify-between gap-2 border-b border-amber-100/80 pb-2">
+      <dt class="font-medium text-slate-600">تلگرام:</dt>
+      <dd class="text-slate-800" dir="ltr">{{ lead.telegram or '—' }}</dd>
+    </div>
+    <div class="flex flex-wrap justify-between gap-2 border-b border-amber-100/80 pb-2">
+      <dt class="font-medium text-slate-600">اینستاگرام:</dt>
+      <dd class="text-slate-800" dir="ltr">{{ lead.instagram or '—' }}</dd>
+    </div>
+    <div class="flex flex-wrap justify-between gap-2 border-b border-amber-100/80 pb-2">
+      <dt class="font-medium text-slate-600">آدرس محل:</dt>
+      <dd class="text-slate-800">{{ lead.address or '—' }}</dd>
+    </div>
+    <div>
+      <dt class="mb-2 font-medium text-slate-600">توضیحات کلی:</dt>
+      <dd class="rounded-lg border border-amber-100 bg-white p-3 whitespace-pre-wrap leading-relaxed text-slate-800">
+        {{ lead.description or '—' }}
+      </dd>
+    </div>
+  </dl>
+  <p class="mt-4 text-xs text-amber-800/80">
+    ثبت‌کننده LH: <span class="font-medium">{{ lead.lh_creator_username }}</span>
+    {% if lead.created_at %}
+    · {{ lead.created_at.strftime('%Y/%m/%d') }}
+    {% endif %}
+  </p>
+</div>
