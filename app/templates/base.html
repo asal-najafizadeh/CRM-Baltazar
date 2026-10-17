@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Baltazar CRM{% endblock %}</title>
+  <title>{% block title %}CRM{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @font-face {
@@ -48,7 +48,7 @@
     <aside class="hidden w-56 shrink-0 border-l border-slate-200 bg-white md:block">
       <div class="sticky top-0 flex h-screen flex-col p-4">
         <a href="{{ url_for('index') }}" class="mb-6 text-lg font-bold text-indigo-700">
-          Baltazar CRM
+          CRM
         </a>
         <p class="mb-4 text-xs text-slate-500">
           نقش:
@@ -90,7 +90,7 @@
       <header class="border-b border-slate-200 bg-gradient-to-l from-indigo-50 via-white to-white shadow-sm">
         <div class="flex flex-wrap items-center justify-between gap-4 px-4 py-4 md:px-8">
           <div class="flex items-center gap-3 md:hidden">
-            <a href="{{ url_for('index') }}" class="text-lg font-bold text-indigo-700">Baltazar CRM</a>
+            <a href="{{ url_for('index') }}" class="text-lg font-bold text-indigo-700">CRM</a>
           </div>
           <div class="flex flex-1 flex-col gap-1 md:items-start">
             <p class="text-base font-semibold text-slate-800">
@@ -129,7 +129,7 @@
       {% else %}
       <header class="border-b border-slate-200 bg-white md:hidden">
         <div class="flex items-center justify-between px-4 py-3">
-          <a href="{{ url_for('index') }}" class="text-lg font-bold text-indigo-700">Baltazar CRM</a>
+          <a href="{{ url_for('index') }}" class="text-lg font-bold text-indigo-700">CRM</a>
         </div>
       </header>
       {% endif %}

@@ -1,17 +1,15 @@
-# Baltazar CRM
+# CRM
 
 # Technical Specification & Architecture Document
 
 | Attribute | Value |
 |-----------|--------|
 | **Document type** | Production-grade Technical Specification & Architecture |
-| **Project** | Baltazar CRM (CRM-Baltazar) |
+| **Project** | Sales Pipeline CRM |
 | **Version** | 1.0.0 |
 | **Status** | Living document — aligned with the current codebase |
 | **Primary language** | Application UI: Persian (RTL); this specification: English |
 | **License** | MIT |
-| **Repository** | https://github.com/WhileTrue0087/CRM-Baltazar |
-| **Reference deployment** | https://crm-baltazar.onrender.com/ |
 
 ---
 
@@ -31,7 +29,7 @@
 
 ### 1.1 Executive summary
 
-**Baltazar CRM** is a self-hosted, sequential sales-pipeline CRM that enforces a five-stage funnel:
+**CRM** is a self-hosted, sequential sales-pipeline CRM that enforces a five-stage funnel:
 
 **Lead Hunter (LH) → SDR → Setter → PM → Closer**, with a sixth **Admin** persona for operations, analytics, user management, Excel import/export, and equal lead distribution.
 
@@ -1045,7 +1043,7 @@ jobs:
       - run: python -m compileall app seed.py run.py
 ```
 
-**Render:** connect GitHub, use `Procfile`, set `SECRET_KEY` and `DATABASE_URL` in dashboard. Live demo pattern: `crm-baltazar.onrender.com`.
+**Render:** connect GitHub, use `Procfile`, set `SECRET_KEY` and `DATABASE_URL` in dashboard. Configure `SECRET_KEY` and `DATABASE_URL` in the host dashboard.
 
 ### 6.8 Backup and operations
 
@@ -1212,4 +1210,4 @@ A: Ensure `app/static/fonts/Dana-Black.ttf` is deployed with the image.
 
 ---
 
-*End of Technical Specification & Architecture Document — Baltazar CRM v1.0.0*
+*End of Technical Specification & Architecture Document — CRM v1.0.0*

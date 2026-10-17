@@ -262,13 +262,13 @@ def sdr_today_leads_query(assigned_sdr_id: int):
 
 def export_sdr_daily_xlsx(leads: list[Lead], sdr_username: str) -> tuple[BytesIO, str]:
   df = build_sdr_daily_rows(leads)
-  filename = f"Baltazar_SDR_{sdr_username}_{jalali_date_filename()}.xlsx"
+  filename = f"CRM_SDR_{sdr_username}_{jalali_date_filename()}.xlsx"
   return _dataframe_to_xlsx(df), filename
 
 
 def export_master_xlsx(leads: list[Lead]) -> tuple[BytesIO, str]:
   df = build_master_rows(leads)
-  filename = f"Baltazar_CRM_Master_{jalali_date_filename()}.xlsx"
+  filename = f"CRM_CRM_Master_{jalali_date_filename()}.xlsx"
   return _dataframe_to_xlsx(df), filename
 
 
@@ -276,5 +276,5 @@ def export_department_xlsx(
   leads: list[Lead], department: str, builder
 ) -> tuple[BytesIO, str]:
   df = builder(leads)
-  filename = f"Baltazar_CRM_{department}_{jalali_date_filename()}.xlsx"
+  filename = f"CRM_CRM_{department}_{jalali_date_filename()}.xlsx"
   return _dataframe_to_xlsx(df), filename
